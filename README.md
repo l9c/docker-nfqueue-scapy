@@ -19,7 +19,7 @@ python-netfilterqueue: https://github.com/kti/python-netfilterqueue
 Clone this repository
 
 ``` shell
-git clone git@github.com:milesrichardson/docker-nfqueue-scapy.git
+git clone git@github.com:l9c/docker-nfqueue-scapy.git
 ```
 
 Build the docker container. This will take a while because it includes the
@@ -33,13 +33,13 @@ sudo docker build . -t nfqueuelistener
 
 (Example)
 
-Use `iptables` on the host to send TCP packets destined for port `9001`
+Use `iptables` on the host to send TCP packets destined for port `8080`
 to nfqueue `1`:
 
 ``` shell
 sudo iptables -t raw \
               -A PREROUTING \
-              -p tcp --destination-port 9001 \
+              -p tcp --destination-port 8080 \
               -j NFQUEUE --queue-num 1
 ```
 
@@ -56,7 +56,7 @@ sudo docker run -it --rm \
 From another machine, send some packets to test:
 
 ``` shell
-echo "Hello" | nc -v $HOST_IP_ADDRESS 9001
+echo "Hello" | nc -v $HOST_IP_ADDRESS 8080
 ```
 
 You should see something like this:
@@ -64,7 +64,7 @@ You should see something like this:
 ``` shell
 miles@box:~/testing$ sudo docker run -it --rm --cap-add=NET_ADMIN --net=host --name=nfqueuelistener nfqueuelistener
 Listening on NFQUEUE queue-num 1...
-<IP  version=4L ihl=5L tos=0x0 len=64 id=6387 flags=DF frag=0L ttl=55 proto=tcp chksum=0x6850 src=11.22.33.44 dst=44.55.66.77 options=[] |<TCP  sport=58164 dport=9001 seq=4038873318 ack=0 dataofs=11L reserved=0L flags=S window=65535 chksum=0x67be urgptr=0 options=[('MSS', 1452), ('NOP', None), ('WScale', 5), ('NOP', None), ('NOP', None), ('Timestamp', (2615879909, 0)), ('SAckOK', ''), ('EOL', None)] |>>
+<IP  version=4L ihl=5L tos=0x0 len=64 id=6387 flags=DF frag=0L ttl=55 proto=tcp chksum=0x6850 src=11.22.33.44 dst=44.55.66.77 options=[] |<TCP  sport=58164 dport=8080 seq=4038873318 ack=0 dataofs=11L reserved=0L flags=S window=65535 chksum=0x67be urgptr=0 options=[('MSS', 1452), ('NOP', None), ('WScale', 5), ('NOP', None), ('NOP', None), ('Timestamp', (2615879909, 0)), ('SAckOK', ''), ('EOL', None)] |>>
 ```
 
 ## Setting the queue number

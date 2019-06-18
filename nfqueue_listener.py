@@ -1,13 +1,14 @@
 #! /usr/bin/env python2.7
 
-from scapy.all import IP
+from scapy.all import *
 from netfilterqueue import NetfilterQueue
 import socket
 from pprint import pprint
-import json
 import os
 import sys
-import logging
+import re
+
+regex = r'^GET \/abc HTTP\/1\.1'
 
 try:
     QUEUE_NUM = int(os.getenv('QUEUE_NUM', 1))
@@ -15,13 +16,15 @@ except ValueError as e:
     sys.stderr.write('Error: env QUEUE_NUM must be integer\n')
     sys.exit(1)
 
+
 def callback(pkt):
 
     try:
         packet = IP(pkt.get_payload())
-
         pprint(packet)
-
+        if Raw in packet[TCP] and re.search(regex, packet[TCP][Raw].load):
+            print "Dropping packet"
+            pkt.drop()
         pkt.accept()
     except Exception as e:
         print 'Error: %s' % str(e)
